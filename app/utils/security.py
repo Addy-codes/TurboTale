@@ -8,7 +8,7 @@ from typing import Optional
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Configuration for JWT
-SECRET_KEY = "your_secret_key"  # Use a strong secret key
+SECRET_KEY = "Addy-codes"  # Use a strong secret key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # or any duration you prefer
 
