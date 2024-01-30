@@ -8,9 +8,9 @@ router = APIRouter(tags=["Authentication"])
 
 @router.post("/register", response_model=schema.UserInDB)
 async def register(user: schema.UserCreate):
-    existing_user = database.find_user_by_email(user.email)
+    existing_user = database.find_user_by_username(user.username)
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Username already taken")
     
     hashed_password = security.get_password_hash(user.password)
     user_data = user.dict()

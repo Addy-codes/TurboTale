@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, errors
 from pymongo.collection import Collection
 from typing import List
 from bson import ObjectId
@@ -104,18 +104,30 @@ def get_blogs_by_user_tags(user_tags: List[str], limit: int, skip: int) -> List[
     blogs = blog_collection.find({"tags": {"$in": ObjectId(user_tags)}}).sort("relevance", -1).skip(skip).limit(limit)
     return [blog_helper(blog) for blog in blogs]
 
-def update_blog(blog_id: str, updated_data: dict) -> dict:
-    """Update an existing blog."""
-    updated_data['updated_at'] = bson.datetime.datetime.utcnow()
-    blog_collection.update_one({"_id": ObjectId(blog_id)}, {"$set": updated_data})
-    updated_blog = blog_collection.find_one({"_id": ObjectId(blog_id)})
-    if updated_blog:
-        return blog_helper(updated_blog)
-
 def delete_blog(blog_id: str) -> bool:
     """Delete a blog."""
     result = blog_collection.delete_one({"_id": ObjectId(blog_id)})
     return result.deleted_count > 0
+
+def update_tags(user_id, update_data):
+    tags_to_add = update_data.pop('add_tags', [])
+    tags_to_remove = update_data.pop('remove_tags', [])
+
+    try:
+        if tags_to_add:
+            user_collection.update_one({"_id": ObjectId(user_id)}, {
+                "$addToSet": {"tags": {"$each": tags_to_add}}})
+
+            # Remove tags from the user's tag list
+        if tags_to_remove:
+            user_collection.update_one({"_id": ObjectId(user_id)}, {
+                "$pullAll": {"tags": tags_to_remove}})
+        updated_user = user_collection.find_one({"_id": ObjectId(user_id)})
+        return user_helper(updated_user)
+    except errors.PyMongoError as e:
+        print(f"Error updating user: {e}")
+        return False
+
 
 # data = {
 #     "username": "test3",
