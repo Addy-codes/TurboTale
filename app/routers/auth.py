@@ -18,7 +18,7 @@ async def register(user: schema.UserCreate):
     return new_user
 
 @router.post("/login", response_model=schema.Token)
-async def login(user_credentials: schema.UserCreate):
+async def login(user_credentials: schema.UserLogin):
     user = database.find_user_by_email(user_credentials.email)
     if not user or not security.verify_password(user_credentials.password, user['password']):
         raise HTTPException(status_code=401, detail="Invalid email or password")

@@ -32,6 +32,14 @@ class User(BaseModel):
         json_encoders = {
             ObjectId: str
         }
+        schema_extra = {
+            "example": {
+                "username": "user123",
+                "email": "user123@example.com",
+                "password": "hashedpassword",
+                "tags": ["coding", "chess"]
+            }
+        }
 
 # Blog Model
 class Blog(BaseModel):
@@ -47,4 +55,12 @@ class Blog(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {
             ObjectId: str
+        }
+        schema_extra = {
+            "example": {
+                "title": "Chess today",
+                "content": "Magnus Carlsen is the Highest rated chess player",
+                "tags": ["Chess", "Magnus"],
+                "author_id": "65b89bf3ce0aef465a8330cd"
+            }
         }

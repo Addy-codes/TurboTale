@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from .. import schema, database
 from bson import ObjectId
 
@@ -20,3 +20,17 @@ async def get_blog(blog_id: str):
     if blog is None:
         raise HTTPException(status_code=404, detail="Blog not found")
     return blog
+
+@router.patch("/blog/{blog_id}", response_model=schema.BlogInDB)
+async def update_blog(blog_id: str, blog_update: schema.BlogUpdate):
+    updated_blog = database.update_blog(blog_id, blog_update.dict(exclude_unset=True))
+    if updated_blog is None:
+        raise HTTPException(status_code=404, detail="Blog not found")
+    return updated_blog
+
+@router.delete("/blog/{blog_id}", status_code=204)
+async def delete_blog(blog_id: str):
+    if not database.delete_blog(blog_id):
+        raise HTTPException(status_code=404, detail="Blog not found")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+

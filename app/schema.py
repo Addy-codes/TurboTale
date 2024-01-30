@@ -5,10 +5,15 @@ from datetime import datetime
 # Schemas for User operations
 
 class UserBase(BaseModel):
-    username: str
     email: EmailStr
 
 class UserCreate(UserBase):
+    username: str
+    password: str
+    tags: Optional[List[str]] = Field(
+        [], example=["coding", "photography"])
+
+class UserLogin(UserBase):
     password: str
 
 class UserUpdate(BaseModel):
@@ -29,6 +34,7 @@ class UserInDB(UserBase):
 class BlogBase(BaseModel):
     title: str
     content: str
+    author_id: str
 
 class BlogCreate(BlogBase):
     tags: Optional[List[str]] = []
@@ -42,7 +48,7 @@ class BlogInDB(BlogBase):
     id: str
     author_id: str
     created_at: datetime
-    updated_at: Optional[datetime]
+    updated_at: Optional[datetime] = None
     tags: List[str] = []
 
     class Config:

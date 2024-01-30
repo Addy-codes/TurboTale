@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from typing import List
 from bson import ObjectId
+import bson
 
 # Configuration for MongoDB connection
 MONGO_DETAILS = "mongodb+srv://addy:admin%40123@cluster0.wwsdot7.mongodb.net/"  # Replace with your MongoDB connection string
@@ -20,7 +21,8 @@ def user_helper(user) -> dict:
         "id": str(user["_id"]),
         "username": user["username"],
         "email": user["email"],
-        # "tags": user["tags"],
+        "password": user["password"],
+        "tags": user["tags"]
         # Add more fields as required
     }
 
@@ -42,6 +44,13 @@ def find_user(user_id: str) -> dict:
     user = user_collection.find_one({"_id": ObjectId(user_id)})
     if user:
         return user_helper(user)
+    
+def update_user(user_id: str, updated_data: dict) -> dict:
+    """Update a user by ID."""
+    user_collection.update_one({"_id": ObjectId(user_id)}, {"$set": updated_data})
+    updated_user = user_collection.find_one({"_id": ObjectId(user_id)})
+    if updated_user:
+        return user_helper(updated_user)
 
 # More user-related database functions...
 
@@ -54,11 +63,15 @@ def blog_helper(blog) -> dict:
         "content": blog["content"],
         "author_id": blog["author_id"],
         "tags": blog["tags"],
+        "created_at": blog["created_at"],
+        "updated_at": blog['updated_at']
         # Add more fields as required
     }
 
 def add_blog(blog_data: dict) -> dict:
     """Add a new blog to the database."""
+    blog_data['created_at'] = bson.datetime.datetime.utcnow()
+    blog_data['updated_at'] = None
     blog = blog_collection.insert_one(blog_data)
     new_blog = blog_collection.find_one({"_id": blog.inserted_id})
     return blog_helper(new_blog)
@@ -81,6 +94,7 @@ def get_blogs_by_user_tags(user_tags: List[str], limit: int, skip: int) -> List[
 
 def update_blog(blog_id: str, updated_data: dict) -> dict:
     """Update an existing blog."""
+    updated_data['updated_at'] = bson.datetime.datetime.utcnow()
     blog_collection.update_one({"_id": ObjectId(blog_id)}, {"$set": updated_data})
     updated_blog = blog_collection.find_one({"_id": ObjectId(blog_id)})
     if updated_blog:
