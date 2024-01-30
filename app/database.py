@@ -38,6 +38,11 @@ def find_user_by_email(email: str) -> dict:
     user = user_collection.find_one({"email": email})
     if user:
         return user_helper(user)
+    
+def find_user_by_username(username: str) -> dict:
+    user = user_collection.find_one({"username": username})
+    if user:
+        return user_helper(user)
 
 def find_user(user_id: str) -> dict:
     """Find a user by ID."""
@@ -51,6 +56,13 @@ def update_user(user_id: str, updated_data: dict) -> dict:
     updated_user = user_collection.find_one({"_id": ObjectId(user_id)})
     if updated_user:
         return user_helper(updated_user)
+    
+def update_user_tags(user_id: str, tags: list[str]) -> dict:
+    """Update the tags of a user."""
+    updated_data = {"tags": tags}
+
+    # Call the existing update_user function to update the user
+    return update_user(user_id, updated_data)
 
 # More user-related database functions...
 

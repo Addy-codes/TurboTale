@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from .. import schema, database
 from ..utils import security
 from bson import ObjectId
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(tags=["Authentication"])
 
@@ -18,11 +19,11 @@ async def register(user: schema.UserCreate):
     return new_user
 
 @router.post("/login", response_model=schema.Token)
-async def login(user_credentials: schema.UserLogin):
-    user = database.find_user_by_email(user_credentials.email)
+async def login_for_access_token(user_credentials: OAuth2PasswordRequestForm = Depends()) -> schema.Token:
+    user = database.find_user_by_username(user_credentials.username)
     if not user or not security.verify_password(user_credentials.password, user['password']):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
     # Generate a JWT token
-    token = security.create_access_token(data={"sub": user['email']})
-    return {"access_token": token, "token_type": "bearer"}
+    token = security.create_access_token(user['username'])
+    return schema.Token(access_token= token, token_type= "bearer")
