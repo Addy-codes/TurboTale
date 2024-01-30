@@ -1,25 +1,25 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from .. import schemas, database
+from .. import schema, database
 from ..utils import security
 from bson import ObjectId
 
 router = APIRouter(tags=["Authentication"])
 
-@router.post("/register", response_model=schemas.UserInDB)
-async def register(user: schemas.UserCreate):
-    existing_user = await database.find_user_by_email(user.email)
+@router.post("/register", response_model=schema.UserInDB)
+async def register(user: schema.UserCreate):
+    existing_user = database.find_user_by_email(user.email)
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    hashed_password = security.hash_password(user.password)
+    hashed_password = security.get_password_hash(user.password)
     user_data = user.dict()
     user_data['password'] = hashed_password
-    new_user = await database.add_user(user_data)
+    new_user = database.add_user(user_data)
     return new_user
 
-@router.post("/login", response_model=schemas.Token)
-async def login(user_credentials: schemas.UserCreate):
-    user = await database.find_user_by_email(user_credentials.email)
+@router.post("/login", response_model=schema.Token)
+async def login(user_credentials: schema.UserCreate):
+    user = database.find_user_by_email(user_credentials.email)
     if not user or not security.verify_password(user_credentials.password, user['password']):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     

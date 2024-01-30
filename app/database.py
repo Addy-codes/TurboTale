@@ -20,7 +20,7 @@ def user_helper(user) -> dict:
         "id": str(user["_id"]),
         "username": user["username"],
         "email": user["email"],
-        "tags": user["tags"],
+        # "tags": user["tags"],
         # Add more fields as required
     }
 
@@ -30,6 +30,12 @@ def add_user(user_data: dict) -> dict:
     new_user = user_collection.find_one({"_id": user.inserted_id})
     print(user.inserted_id)
     return user_helper(new_user)
+
+def find_user_by_email(email: str) -> dict:
+    """Find a user by ID."""
+    user = user_collection.find_one({"email": email})
+    if user:
+        return user_helper(user)
 
 def find_user(user_id: str) -> dict:
     """Find a user by ID."""
