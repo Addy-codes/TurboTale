@@ -8,11 +8,14 @@ router = APIRouter(tags=["Blogs"])
 
 @router.post("/blog", response_model=schema.BlogInDB)
 async def create_blog(blog: schema.BlogCreate, current_user: schema.UserInDB = Depends(security.get_current_user)):
-    new_blog = database.add_blog(blog.dict())
+    new_blog = database.add_blog(blog.dict(), current_user['id'])
     return new_blog
 
 @router.get("/blogs", response_model=list[schema.BlogInDB])
-async def get_all_blogs(limit: int = 10, skip: int = 0):
+async def get_all_blogs(page_no: int = Query(default=1, ge=1),
+    records_per_page: int = Query(default=5, le=100)):
+    skip = (page_no - 1) * records_per_page
+    limit = records_per_page
     blogs = database.get_all_blogs(limit, skip)
     return blogs
 
@@ -26,6 +29,8 @@ async def get_blog(blog_id: str, current_user: schema.UserInDB = Depends(securit
 @router.patch("/blog/{blog_id}", response_model=schema.BlogInDB)
 async def update_blog(blog_id: str, blog_update: schema.BlogUpdate, current_user: schema.UserInDB = Depends(security.get_current_user)):
     blog = database.get_blog_by_id(blog_id)
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
     if blog['author_id'] != current_user['id']:
         raise HTTPException(status_code=401, detail="You cannot change this blog since you're not the author")
     updated_blog = database.update_blog(blog_id, blog_update.dict(exclude_unset=True))
@@ -35,15 +40,21 @@ async def update_blog(blog_id: str, blog_update: schema.BlogUpdate, current_user
     
 
 @router.delete("/blog/{blog_id}", status_code=204)
-async def delete_blog(blog_id: str):
+async def delete_blog(blog_id: str, current_user: schema.UserInDB = Depends(security.get_current_user)):
+    blog = database.get_blog_by_id(blog_id)
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
+    if blog['author_id'] != current_user['id']:
+        raise HTTPException(status_code=401, detail="You cannot delete this blog since you're not the author")
     if not database.delete_blog(blog_id):
         raise HTTPException(status_code=404, detail="Blog not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
+
 @router.get("/dashboard", response_model=list[schema.BlogInDB])
 async def get_matching_blogs(
-    page_no: int = Query(default=0, ge=0),
-    records_per_page: int = Query(default=10, le=100),
+    page_no: int = Query(default=1, ge=1),
+    records_per_page: int = Query(default=5, le=100),
     current_user: schema.UserInDB = Depends(security.get_current_user)
 ):
     # Fetch current user's tags

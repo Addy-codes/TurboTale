@@ -39,9 +39,9 @@ class UpdateUserTags(BaseModel):
 class BlogBase(BaseModel):
     title: str
     content: str
-    author_id: str
 
 class BlogCreate(BlogBase):
+    author_id: Optional[str] = None
     tags: Optional[List[str]] = []
 
 class BlogUpdate(BaseModel):

@@ -22,7 +22,7 @@ async def register(user: schema.UserCreate):
 async def login_for_access_token(user_credentials: OAuth2PasswordRequestForm = Depends()) -> schema.Token:
     user = database.find_user_by_username(user_credentials.username)
     if not user or not security.verify_password(user_credentials.password, user['password']):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        raise HTTPException(status_code=401, detail="Invalid username or password")
     
     # Generate a JWT token
     token = security.create_access_token(user['username'])

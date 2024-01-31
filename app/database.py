@@ -79,8 +79,9 @@ def blog_helper(blog) -> dict:
 
     }
 
-def add_blog(blog_data: dict) -> dict:
+def add_blog(blog_data: dict, author_id: str) -> dict:
     """Add a new blog to the database."""
+    blog_data['author_id'] = author_id
     blog_data['created_at'] = bson.datetime.datetime.utcnow()
     blog_data['updated_at'] = None
     blog = blog_collection.insert_one(blog_data)
