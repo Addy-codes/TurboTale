@@ -2,7 +2,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from .. import schema, database  # Import your user schema
+from .. import schema, database
 from jose import jwt, JWTError
 from typing import Optional
 
@@ -12,13 +12,10 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Configuration for JWT
 SECRET_KEY = "Addycodes"  # Use a strong secret key
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30  # or any duration you prefer
+ACCESS_TOKEN_EXPIRE_MINUTES = 30  
 
-# Assuming your OAuth2PasswordBearer is set up with a token URL
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
-# class TokenData:
-#     username: Optional[str] = None
     
 
 def verify_password(plain_password, hashed_password):

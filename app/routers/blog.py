@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Query
 from .. import schema, database
 from bson import ObjectId
 from ..utils import security
+from typing import List
 
 router = APIRouter(tags=["Blogs"])
 
@@ -38,3 +39,38 @@ async def delete_blog(blog_id: str):
     if not database.delete_blog(blog_id):
         raise HTTPException(status_code=404, detail="Blog not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.get("/dashboard", response_model=list[schema.BlogInDB])
+async def get_matching_blogs(
+    page_no: int = Query(default=0, ge=0),
+    records_per_page: int = Query(default=10, le=100),
+    current_user: schema.UserInDB = Depends(security.get_current_user)
+):
+    # Fetch current user's tags
+    user_data = database.user_collection.find_one({"_id": ObjectId(current_user['id'])})
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_tags = user_data.get('tags', [])
+
+    skip = (page_no - 1) * records_per_page
+    limit = records_per_page
+
+    # Query for matching blogs
+    pipeline = [
+        {"$addFields": {
+            "relevance": {
+                "$size": {
+                    "$setIntersection": ["$tags", user_tags]
+                }
+            }
+        }},
+        {"$match": {"relevance": {"$gt": 0}}},
+        {"$sort": {"relevance": -1}},
+        {"$skip": skip},
+        {"$limit": limit}
+    ]
+    
+    blogs = list(database.blog_collection.aggregate(pipeline))
+    print(blogs)
+    return [database.blog_helper(blog) for blog in blogs]

@@ -64,7 +64,6 @@ def update_user_tags(user_id: str, tags: list[str]) -> dict:
     # Call the existing update_user function to update the user
     return update_user(user_id, updated_data)
 
-# More user-related database functions...
 
 # Helper functions for Blog collection
 def blog_helper(blog) -> dict:
@@ -77,7 +76,7 @@ def blog_helper(blog) -> dict:
         "tags": blog["tags"],
         "created_at": blog["created_at"],
         "updated_at": blog['updated_at']
-        # Add more fields as required
+
     }
 
 def add_blog(blog_data: dict) -> dict:
