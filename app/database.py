@@ -104,6 +104,14 @@ def get_blogs_by_user_tags(user_tags: List[str], limit: int, skip: int) -> List[
     blogs = blog_collection.find({"tags": {"$in": ObjectId(user_tags)}}).sort("relevance", -1).skip(skip).limit(limit)
     return [blog_helper(blog) for blog in blogs]
 
+def update_blog(blog_id: str, updated_data: dict) -> dict:
+    """Update an existing blog."""
+    updated_data['updated_at'] = bson.datetime.datetime.utcnow()
+    blog_collection.update_one({"_id": ObjectId(blog_id)}, {"$set": updated_data})
+    updated_blog = blog_collection.find_one({"_id": ObjectId(blog_id)})
+    if updated_blog:
+        return blog_helper(updated_blog)
+
 def delete_blog(blog_id: str) -> bool:
     """Delete a blog."""
     result = blog_collection.delete_one({"_id": ObjectId(blog_id)})

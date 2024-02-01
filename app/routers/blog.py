@@ -83,5 +83,5 @@ async def get_matching_blogs(
     ]
     
     blogs = list(database.blog_collection.aggregate(pipeline))
-    print(blogs)
+    # print(blogs)
     return [database.blog_helper(blog) for blog in blogs]
