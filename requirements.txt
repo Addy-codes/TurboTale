@@ -1,5 +1,4 @@
-fastapi 
-bson
+fastapi
 pymongo
 uvicorn
 passlib[bcrypt]

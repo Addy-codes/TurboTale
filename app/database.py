@@ -3,9 +3,10 @@ from pymongo.collection import Collection
 from typing import List
 from bson import ObjectId
 import bson
+from os import environ as env
 
 # Configuration for MongoDB connection
-MONGO_DETAILS = "mongodb+srv://addy:admin%40123@cluster0.wwsdot7.mongodb.net/"  # Replace with your MongoDB connection string
+MONGO_DETAILS = f"mongodb+srv://{env['MONGO_USERNAME']}:{env['MONGO_PASSWORD']}@cluster0.wwsdot7.mongodb.net/"  # Replace with your MongoDB connection string
 
 client = MongoClient(MONGO_DETAILS)
 
