@@ -4,6 +4,15 @@
 ## Description
 This Turbo-Tale is a FastAPI-based web service designed to provide a backend for blog applications. It offers a range of functionalities including user authentication, creating, editing, and retrieving blog posts, and user management.
 
+## API Docs:
+
+![image](https://github.com/Addy-codes/TurboTale/assets/72205091/5a64804c-6449-4e26-a49c-7343b93837fa)
+
+
+![image](https://github.com/Addy-codes/TurboTale/assets/72205091/3ffb639a-6940-4b99-bdc3-8ff0f74e9bac)
+
+
+
 ## Running the API Locally
 To run the API locally, follow these steps:
 
