@@ -6,7 +6,7 @@ import bson
 from os import environ as env
 
 # Configuration for MongoDB connection
-MONGO_DETAILS = f"mongodb+srv://{env['MONGO_USERNAME']}:{env['MONGO_PASSWORD']}@cluster0.wwsdot7.mongodb.net/"  # Replace with your MongoDB connection string
+MONGO_DETAILS = f"mongodb+srv://{env.get('MONGO_USERNAME')}:{env.get('MONGO_PASSWORD')}@cluster0.wwsdot7.mongodb.net/"  # Replace with your MongoDB connection string
 
 client = MongoClient(MONGO_DETAILS)
 

@@ -41,7 +41,6 @@ class BlogBase(BaseModel):
     content: str
 
 class BlogCreate(BlogBase):
-    author_id: Optional[str] = None
     tags: Optional[List[str]] = []
 
 class BlogUpdate(BaseModel):
